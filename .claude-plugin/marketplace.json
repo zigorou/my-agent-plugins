@@ -1,0 +1,10 @@
+{
+  "name": "my-agent-plugins",
+  "owner": {
+    "name": "zigorou"
+  },
+  "metadata": {
+    "description": "Personal grab-bag of Claude Code agent plugins"
+  },
+  "plugins": []
+}

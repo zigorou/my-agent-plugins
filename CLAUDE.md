@@ -6,6 +6,16 @@
 
 このリポジトリは Claude Code プラグイン集である。`.claude-plugin/marketplace.json` と `plugins/` フラット配置をとり、各プラグインは自己完結し orientation スキルを持つ。
 
+## レイアウト規約
+
+- マーケットプレイスカタログは `.claude-plugin/marketplace.json`。plugin を追加・改名したら、カタログも同じ変更で更新する (`source: "./plugins/<name>"`)
+- 配布物は `plugins/<name>/` にフラット配置する。マニフェストは `plugins/<name>/.claude-plugin/plugin.json`
+- plugin の中身を変えたら `plugin.json` の `version` を bump する。`version` は cache key で、据え置くと更新が届かない
+- 機能は skills で構成し、commands は作らない
+- 各 plugin にオリエンテーション skill を 1 つ置く。配置は `skills/<plugin-name>/SKILL.md`
+- 各 plugin は自己完結に保つ。インストール時に cache へコピーされるため、`../` で repo 内の他ファイルを参照できない
+- commit 前に `claude plugin validate .` (カタログ) と `claude plugin validate plugins/<name>` (各 plugin) を通す
+
 ## 設計原則
 
 <!-- springhead default。このリポジトリの事情に合わせて上書き・追記してよい。 -->
