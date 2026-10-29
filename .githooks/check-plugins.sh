@@ -4,7 +4,8 @@
 # 1. plugin.json に version が無い plugin を落とす (明示 bump 方針の前提)
 # 2. 中身が変わったのに version が据え置きの plugin を落とす
 #    (version は cache key であり、据え置くと GitHub 経由の購読者に更新が届かない)
-# 3. `claude plugin validate` をカタログと各 plugin に通す
+# 3. カタログと plugins/ の整合 (source / name / 掲載漏れ / entry の version / renames) を見る
+# 4. `claude plugin validate` をカタログと各 plugin に通す
 #
 # 判定は index (staged) を正とする。commit されるものを見るため。
 # bump の判定範囲はブランチ全体 (merge-base から index まで)。squash merge 運用では
@@ -15,6 +16,8 @@
 set -euo pipefail
 
 MANIFEST_REL=".claude-plugin/plugin.json"
+CATALOG=".claude-plugin/marketplace.json"
+NAME_RE='^[a-z0-9]+(-[a-z0-9]+)*$'
 
 for bin in jq claude; do
   if ! command -v "$bin" >/dev/null 2>&1; then
@@ -29,9 +32,9 @@ indexed_plugins() {
   git ls-files -- plugins/ | awk -F/ 'NF >= 3 { print $2 }' | sort -u
 }
 
-# index 側の version。無ければ空。
-version_in_index() {
-  git show ":plugins/$1/$MANIFEST_REL" 2>/dev/null | jq -r '.version // empty' 2>/dev/null || true
+# <ref> 時点にあった plugin 名を列挙する。
+plugins_at_ref() {
+  git ls-tree --name-only "$1" plugins/ 2>/dev/null | awk -F/ '{ print $2 }' | grep -v '^\.' || true
 }
 
 # <ref> 時点の version。無ければ空。
@@ -39,14 +42,12 @@ version_at_ref() {
   git show "$1:plugins/$2/$MANIFEST_REL" 2>/dev/null | jq -r '.version // empty' 2>/dev/null || true
 }
 
-# 比較の起点。default branch 上や base が引けないときは空を返し、bump 判定を飛ばす
-# (default branch への直 commit は git-guard が別途止める)。
+# 比較の起点。origin を先に引くので、default branch 上でも未 push 分を切り出せる。
+# 引けなければ空を返す (呼び出し側が警告して bump と renames の判定を飛ばす)。
 resolve_base() {
-  local default cur
+  local default
   default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##' || true)
   [[ -z $default ]] && default=main
-  cur=$(git branch --show-current 2>/dev/null || true)
-  [[ -z $cur || $cur == "$default" ]] && return 0
   git merge-base "origin/$default" HEAD 2>/dev/null ||
     git merge-base "$default" HEAD 2>/dev/null ||
     true
@@ -54,14 +55,20 @@ resolve_base() {
 
 errors=()
 base=$(resolve_base)
+[[ -z $base ]] && echo "check-plugins: 比較の起点 (merge-base) を解決できないため、bump と renames の判定を飛ばします。" >&2
 
 while IFS= read -r name; do
   [[ -z $name ]] && continue
-  if ! git cat-file -e ":plugins/$name/$MANIFEST_REL" 2>/dev/null; then
+  [[ $name =~ $NAME_RE ]] || errors+=("plugins/$name: plugin 名が kebab-case ではありません")
+  if ! manifest=$(git show ":plugins/$name/$MANIFEST_REL" 2>/dev/null); then
     errors+=("plugins/$name/$MANIFEST_REL が index にありません")
     continue
   fi
-  new=$(version_in_index "$name")
+  if ! printf '%s' "$manifest" | jq -e . >/dev/null 2>&1; then
+    errors+=("plugins/$name/$MANIFEST_REL が JSON として不正です")
+    continue
+  fi
+  new=$(printf '%s' "$manifest" | jq -r '.version // empty')
   if [[ -z $new ]]; then
     errors+=("plugins/$name/$MANIFEST_REL に version がありません (明示 bump 方針のため必須)")
     continue
@@ -76,43 +83,68 @@ while IFS= read -r name; do
 done < <(indexed_plugins)
 
 # カタログと plugins/ の整合。`claude plugin validate` は source の実在を見ないため、ここで見る。
-CATALOG=".claude-plugin/marketplace.json"
-catalog=$(git show ":$CATALOG" 2>/dev/null) || { errors+=("$CATALOG が index にありません"); catalog='{"plugins":[]}'; }
-while IFS=$'\t' read -r entry src has_version; do
-  [[ -z $entry ]] && continue
-  dir=${src#./}
-  manifest_name=$(git show ":$dir/$MANIFEST_REL" 2>/dev/null | jq -r '.name // empty' 2>/dev/null || true)
-  if [[ -z $manifest_name ]]; then
-    errors+=("カタログ entry $entry の source $src に $MANIFEST_REL がありません")
-  elif [[ $manifest_name != "$entry" ]]; then
-    errors+=("カタログ entry $entry と $dir/$MANIFEST_REL の name ($manifest_name) が一致しません")
+if ! catalog=$(git show ":$CATALOG" 2>/dev/null); then
+  errors+=("$CATALOG が index にありません")
+elif ! printf '%s' "$catalog" | jq -e . >/dev/null 2>&1; then
+  errors+=("$CATALOG が JSON として不正です")
+else
+  while IFS=$'\t' read -r entry src_type src has_version; do
+    [[ -z $entry ]] && continue
+    [[ $has_version == true ]] && errors+=("カタログ entry $entry に version があります (plugin.json 側だけに書く)")
+    if [[ $src_type != string ]]; then
+      errors+=("カタログ entry $entry: この repo では source に相対パス (./plugins/<name>) 以外を使いません")
+      continue
+    fi
+    dir=${src#./}
+    dir=${dir%/}
+    manifest_name=$(git show ":$dir/$MANIFEST_REL" 2>/dev/null | jq -r '.name // empty' 2>/dev/null || true)
+    if [[ -z $manifest_name ]]; then
+      errors+=("カタログ entry $entry の source $src に $MANIFEST_REL がありません")
+    elif [[ $manifest_name != "$entry" ]]; then
+      errors+=("カタログ entry $entry と $dir/$MANIFEST_REL の name ($manifest_name) が一致しません")
+    fi
+  done < <(printf '%s' "$catalog" | jq -r '.plugins[] | [.name, (.source | type), (.source | tostring), (has("version") | tostring)] | @tsv')
+
+  while IFS= read -r name; do
+    [[ -z $name ]] && continue
+    printf '%s' "$catalog" | jq -e --arg s "plugins/$name" \
+      'any(.plugins[]; (.source | type) == "string" and (.source | ltrimstr("./") | rtrimstr("/")) == $s)' >/dev/null ||
+      errors+=("plugins/$name がカタログに載っていません")
+  done < <(indexed_plugins)
+
+  # base にあって index から消えた plugin (削除・改名) は renames に旧名が要る。
+  # 書かないとインストール済みの環境で plugin が見つからなくなる。
+  if [[ -n $base ]]; then
+    while IFS= read -r name; do
+      [[ -z $name ]] && continue
+      [[ -n $(git ls-files -- "plugins/$name/") ]] && continue
+      printf '%s' "$catalog" | jq -e --arg n "$name" '(.renames // {}) | has($n)' >/dev/null ||
+        errors+=("plugins/$name が消えましたが、カタログの renames に $name がありません (改名なら新名、削除なら null)")
+    done < <(plugins_at_ref "$base")
   fi
-  [[ $has_version == true ]] && errors+=("カタログ entry $entry に version があります (plugin.json 側だけに書く)")
-done < <(printf '%s' "$catalog" | jq -r '.plugins[] | [.name, (.source | tostring), (has("version") | tostring)] | @tsv')
-while IFS= read -r name; do
-  [[ -z $name ]] && continue
-  printf '%s' "$catalog" | jq -e --arg s "./plugins/$name" 'any(.plugins[]; .source == $s)' >/dev/null ||
-    errors+=("plugins/$name がカタログに載っていません")
-done < <(indexed_plugins)
+fi
 
 if ((${#errors[@]})); then
   echo "check-plugins: commit を停止しました。" >&2
   printf '  - %s\n' "${errors[@]}" >&2
-  [[ -n $base ]] && echo "  (bump の判定範囲は $base から index までのブランチ全体)" >&2
+  [[ -n $base ]] && echo "  (bump と renames の判定範囲は $base から index まで)" >&2
   exit 1
 fi
 
-# validate は作業ツリーを読む。staged と作業ツリーがずれていると、commit されない内容で判定される。
-claude plugin validate . >/dev/null || {
-  claude plugin validate . >&2 || true
-  echo "check-plugins: カタログの validate に失敗しました。" >&2
+# validate は渡したディレクトリを読む。index を一時ディレクトリへ書き出して渡し、
+# commit される内容で判定する (stash は worktree 間で共有されるため使わない)。
+snapshot=$(mktemp -d)
+trap 'rm -rf "$snapshot"' EXIT
+git checkout-index -a --prefix="$snapshot/"
+
+validate() { # <dir> <label>
+  claude plugin validate "$1" >/dev/null && return 0
+  claude plugin validate "$1" >&2 || true
+  echo "check-plugins: $2 の validate に失敗しました。" >&2
   exit 1
 }
+validate "$snapshot" "$CATALOG"
 while IFS= read -r name; do
   [[ -z $name ]] && continue
-  claude plugin validate "plugins/$name" >/dev/null || {
-    claude plugin validate "plugins/$name" >&2 || true
-    echo "check-plugins: plugins/$name の validate に失敗しました。" >&2
-    exit 1
-  }
+  validate "$snapshot/plugins/$name" "plugins/$name"
 done < <(indexed_plugins)

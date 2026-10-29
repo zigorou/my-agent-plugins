@@ -28,6 +28,13 @@ push した更新を取り込むには `/plugin marketplace update my-agent-plug
 
 ## plugin の追加
 
+clone 直後に一度だけ hook を有効にする (未設定だと commit 前の検査がすべて抜ける)。
+
+```
+git config core.hooksPath .githooks
+```
+
 1. `plugins/<name>/` に plugin を置く。`.claude-plugin/plugin.json` には `name` / `version` (例: `0.1.0`) / `description` / `author` を書き、オリエンテーション skill を `skills/<name>/SKILL.md` に置く
 2. `.claude-plugin/marketplace.json` の `plugins` に `{"name": "<name>", "source": "./plugins/<name>", "description": "..."}` を追加する (`version` は書かない)
-3. commit すると `.githooks/check-plugins.sh` が version と `claude plugin validate` を検査する
+3. commit すると `.githooks/check-plugins.sh` が version・カタログとの整合・`claude plugin validate` を検査する
+4. plugin を改名・削除するときは、カタログ top-level の `renames` に旧名を追記する (改名なら新名、削除なら `null`)
