@@ -1,0 +1,22 @@
+[
+  {"query": "/fxtwitter:fxtwitter-show https://x.com/jack/status/20", "should_trigger": true},
+  {"query": "このポストの中身をそのまま表示して https://x.com/buzzdotxyz/status/2115816164945527294", "should_trigger": true},
+  {"query": "https://x.com/levelsio/status/2114797163372847446 の本文、原文のまま見せて。要約はいらない", "should_trigger": true},
+  {"query": "X にログインしてないから見れない。https://twitter.com/naval/status/2100234414739571063 のツイート本文と画像を出して", "should_trigger": true},
+  {"query": "この X の記事を全文出して。会社のネットワークから x.com が開けないので https://x.com/naval/status/2099476024979317096", "should_trigger": true},
+  {"query": "https://x.com/buzzdotxyz/status/2115816164945527294 動画のURLだけでいいから取ってきて", "should_trigger": true},
+  {"query": "このツイートいいね数とリポスト数どれくらい？ あと本文も https://x.com/jack/status/20", "should_trigger": true},
+  {"query": "引用元のポストも含めて表示してほしい https://x.com/paulg/status/2114815685960618081", "should_trigger": true},
+  {"query": "スクショ撮れないから、このポストの中身テキストで貼って https://fxtwitter.com/levelsio/status/2114797163372847446", "should_trigger": true},
+  {"query": "https://x.com/naval/status/2100234414739571063 にコミュニティノート付いてる？ 付いてたら内容も見せて", "should_trigger": true},
+  {"query": "このポストどう思う？ 賛成できる？ https://x.com/naval/status/2099476024979317096", "should_trigger": false},
+  {"query": "https://x.com/paulg/status/2114815685960618081 この連投、全部まとめて要点だけ教えて", "should_trigger": false},
+  {"query": "このスレッド (🧵) を最初から最後まで順番に全部表示して https://x.com/paulg/status/2114815685960618081", "should_trigger": false},
+  {"query": "このポストの内容を踏まえて、うちのブログ記事の導入文を書き直して https://x.com/levelsio/status/2114797163372847446", "should_trigger": false},
+  {"query": "x.com のポストを埋め込み表示する React コンポーネントを書いて。react-tweet と自前実装どっちがいい？", "should_trigger": false},
+  {"query": "Slack に x.com のリンクを貼ると展開されないのはなぜ？ 設定で直せる？", "should_trigger": false},
+  {"query": "fxtwitter の API の rate limit って何リクエスト/分？", "should_trigger": false},
+  {"query": "このMastodonの投稿の中身を表示して https://mastodon.social/@Gargron/109932468356876913", "should_trigger": false},
+  {"query": "ツイートのスクショ画像 (~/Downloads/tweet.png) から本文を文字起こしして", "should_trigger": false},
+  {"query": "自分の過去ツイートのアーカイブ (twitter-2024.zip) から、いいね数トップ10を集計して", "should_trigger": false}
+]

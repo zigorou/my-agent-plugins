@@ -1,0 +1,22 @@
+[
+  {"query": "/fxtwitter:fxtwitter-thread https://x.com/paulg/status/2114815685960618081", "should_trigger": true},
+  {"query": "https://x.com/paulg/status/2114815685960618081 このスレッド全部読んで要点まとめて", "should_trigger": true},
+  {"query": "この連投 (🧵 1/12 ってやつ) を最初から最後まで順番に表示して https://x.com/naval/status/2100234414739571063", "should_trigger": true},
+  {"query": "ツリーになってる長文ポストを一気に読みたい。続きも全部取ってきて https://twitter.com/levelsio/status/2114797163372847446", "should_trigger": true},
+  {"query": "https://x.com/naval/status/2099476024979317096 の🧵、結論はどこに書いてある？ 何番目のポスト？", "should_trigger": true},
+  {"query": "このスレの続きが見れない。全部繋げて読める形にして https://x.com/paulg/status/2114797163372847446", "should_trigger": true},
+  {"query": "著者が自分でリプライで繋げてる連投をまとめて日本語で要約して https://x.com/levelsio/status/2114797163372847446", "should_trigger": true},
+  {"query": "このスレッドの途中のポストのリンクしかないんだけど、最初から全部取れる？ https://x.com/paulg/status/2114815685960618081", "should_trigger": true},
+  {"query": "連投ツイートを議事録っぽく箇条書きに整理して https://x.com/naval/status/2100234414739571063", "should_trigger": true},
+  {"query": "スレッド全体で主張が一貫してるかチェックして。矛盾があったら番号付きで指摘して https://x.com/paulg/status/2114815685960618081", "should_trigger": true},
+  {"query": "このポストの本文だけ表示して。単発のツイートだから https://x.com/jack/status/20", "should_trigger": false},
+  {"query": "このツイートって何が言いたいの？ https://x.com/buzzdotxyz/status/2115816164945527294", "should_trigger": false},
+  {"query": "/fxtwitter:fxtwitter-show https://x.com/levelsio/status/2114797163372847446", "should_trigger": false},
+  {"query": "このポストへのリプライ欄で、どんな反論が出てるか教えて https://x.com/naval/status/2099476024979317096", "should_trigger": false},
+  {"query": "Slack のスレッドを要約する bot を作りたい。Bolt for Python でどう書く？", "should_trigger": false},
+  {"query": "このメールスレッド (thread.eml) の論点を整理して", "should_trigger": false},
+  {"query": "X で長文を連投するとき、何文字ごとに区切るのが読みやすい？ 自分のスレッドを書く前に知りたい", "should_trigger": false},
+  {"query": "Threads (Meta) の投稿 https://www.threads.net/@zuck/post/C8ZtxyzABcd の内容を読んで", "should_trigger": false},
+  {"query": "GitHub の issue #42 のコメントスレッドを時系列でまとめて", "should_trigger": false},
+  {"query": "このユーザーの最近のポストを10件読んで、どんな話題が多いか教えて https://x.com/paulg", "should_trigger": false}
+]
