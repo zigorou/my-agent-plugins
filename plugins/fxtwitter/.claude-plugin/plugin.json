@@ -1,0 +1,10 @@
+{
+  "name": "fxtwitter",
+  "version": "0.1.0",
+  "description": "Read X (Twitter) posts, threads and articles through the FxTwitter API, treating fetched content as untrusted data",
+  "author": {
+    "name": "zigorou"
+  },
+  "license": "MIT",
+  "keywords": ["x", "twitter", "fxtwitter"]
+}
