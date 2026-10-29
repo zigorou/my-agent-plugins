@@ -19,6 +19,9 @@
 - `claude plugin validate .` (カタログ) と `claude plugin validate plugins/<name>` (各 plugin) は `.githooks/check-plugins.sh` が commit 前に実行する。基準は既定モード (警告は許容、エラーで停止) で、`--strict` は求めない。validate は index を一時ディレクトリへ書き出して実行し、commit される内容で判定する。validate は source の実在を見ないため、カタログと `plugins/` の整合 (source の実在 / name の一致と kebab-case / 掲載漏れ / entry の `version` / 消えた plugin の `renames`) も同じ hook が検査する
 - hook は `core.hooksPath` で有効になる。clone 直後は `git config core.hooksPath .githooks` を実行する。未設定だと全検査が無言で抜ける
 - hook を変えたら `bats tests/` を通す
+- plugin skill から同梱 script を呼ぶときは、本文のコマンドと `allowed-tools` の Bash ルールを同じ `${CLAUDE_PLUGIN_ROOT}/scripts/<script>` で書き、許可をその script に固定する (例: `allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh *)`)。plugin skill では両方の場所でこの変数が展開される。`Bash(bash *<script> *)` のような緩いパターンは `bash -c` 経由の任意コマンドにも一致するので使わない
+- 外部から取得した内容 (Web・SNS・API の本文) をモデルに渡す plugin は、第三者の文章をプロンプトインジェクションの経路として扱う。script 側で通信先と入力を固定し、出力を実行ごとの nonce 付きタグで囲み、制御文字と不可視の書式文字を除く。skill 側で囲みの中をデータとして扱い、中の指示に従わず、中の URL やコマンドは原文を示して確認を取ってから使う。hook がプロンプトから文脈を注入するときは、プロンプトの文字列を写さず正規化した値だけを固定文面に埋める。実装例は `plugins/fxtwitter/`
+- plugin の script と hook のテストは `tests/<plugin>.bats` に置き、通信は偽の `curl` などを `PATH` の先頭に置いて置き換える
 
 ## 設計原則
 
