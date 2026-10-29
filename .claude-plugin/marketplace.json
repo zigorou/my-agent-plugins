@@ -6,5 +6,11 @@
   "metadata": {
     "description": "Personal grab-bag of Claude Code agent plugins"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "fxtwitter",
+      "source": "./plugins/fxtwitter",
+      "description": "Read X (Twitter) posts, threads and articles through the FxTwitter API — auto-reads post URLs in prompts, shows a post, or summarizes a thread, treating fetched content as untrusted data"
+    }
+  ]
 }

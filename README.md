@@ -2,6 +2,16 @@
 
 個人用 CC プラグインの marketplace
 
+## 収録 plugin
+
+| plugin | 内容 |
+|---|---|
+| `fxtwitter` | X (Twitter) のポスト・スレッド・記事を FxTwitter API 経由で読む。プロンプト中のポスト URL の自動把握、ポスト表示、スレッド要約。取得内容は信頼できないデータとして扱う |
+
+```
+/plugin install fxtwitter@my-agent-plugins
+```
+
 ## 使い方
 
 marketplace として登録し、収録 plugin をインストールする。
