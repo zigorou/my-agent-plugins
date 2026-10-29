@@ -15,7 +15,7 @@ X のポストを取得し、内容をそのまま読める形で表示する。
 2. 同梱 script で取得する
 
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh status "<URL>"
+   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh status '<URL>'
    ```
 
 3. 囲みの中身を、次の形で表示する。本文と記事本文は要約せず原文のまま出す (ユーザーは中身そのものを見たい)

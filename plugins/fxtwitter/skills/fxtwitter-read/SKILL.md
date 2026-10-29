@@ -15,7 +15,7 @@ allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh *)
 2. URL ごとに同梱 script で取得する
 
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh status "<URL>"
+   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh status '<URL>'
    ```
 
 3. 取得した内容を踏まえて、ユーザーの本来の依頼に答える。ポストの要点は必要な分だけ引用・要約し、出典としてポストの URL を添える

@@ -15,7 +15,7 @@ allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh *)
 2. 同梱 script を `thread` モードで実行する
 
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh thread "<URL>"
+   ${CLAUDE_PLUGIN_ROOT}/scripts/fx-fetch.sh thread '<URL>'
    ```
 
    出力は `### [i/n]` の見出しで区切られた連投の並びである。script が起点ポストの著者のものだけに絞っているので、他人の返信は含まない

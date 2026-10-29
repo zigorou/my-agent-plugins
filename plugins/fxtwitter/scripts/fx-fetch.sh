@@ -23,6 +23,7 @@ usage() {
 }
 
 # 制御文字と不可視の書式文字 (C0/C1・bidi 制御・ゼロ幅など) を除去する。改行とタブは残す。
+# ZWJ (U+200D) も消えるため合成絵文字は分かれて表示されるが、安全側に倒して許容する。
 strip_controls() {
   perl -CSD -pe 's/(?![\n\t])[\p{Cc}\p{Cf}]//g'
 }
@@ -64,9 +65,16 @@ body=$(curl -sS --proto '=https' --connect-timeout 5 --max-time 20 --max-filesiz
   die "FxTwitter API への接続に失敗しました ($API/$mode/$id)"
 code=$(printf '%s' "$body" | jq -r '.code // empty' 2>/dev/null) ||
   die "FxTwitter API の応答が JSON ではありません"
-# API が返す message は外部由来の文字列なので、制御文字を落として 200 文字に切る。
-[[ $code == 200 ]] ||
-  die "FxTwitter API がエラーを返しました (code=${code:-?}): $(printf '%s' "$body" | jq -r '.message // empty' 2>/dev/null | strip_controls | cut -c1-200)"
+[[ $code =~ ^[0-9]{1,3}$ ]] || code='?'
+if [[ $code != 200 ]]; then
+  case $code in
+    401 | 403 | 404) reason="削除済み・非公開・存在しないポストの可能性があります" ;;
+    *) reason="" ;;
+  esac
+  # API が返す message は外部由来の文字列なので、制御文字を落として 200 文字に切る。
+  message=$(printf '%s' "$body" | jq -r '.message // empty' 2>/dev/null | strip_controls | cut -c1-200)
+  die "FxTwitter API がエラーを返しました (code=$code)${reason:+。$reason}${message:+ / API: $message}"
+fi
 printf '%s' "$body" | jq -e '.status | type == "object"' >/dev/null 2>&1 ||
   die "FxTwitter API の応答にポストが含まれていません (削除済み・非公開の可能性があります)"
 
