@@ -4,17 +4,19 @@
 
 個人用 CC プラグインの marketplace
 
-このリポジトリは Claude Code プラグイン集である。`.claude-plugin/marketplace.json` と `plugins/` フラット配置をとり、各プラグインは自己完結し orientation スキルを持つ。
+このリポジトリは Claude Code プラグイン集である。`.claude-plugin/marketplace.json` と `plugins/` フラット配置をとり、各プラグインは自己完結しオリエンテーション skill を持つ。
 
 ## レイアウト規約
 
-- マーケットプレイスカタログは `.claude-plugin/marketplace.json`。plugin を追加・改名したら、カタログも同じ変更で更新する (`source: "./plugins/<name>"`)
+- マーケットプレイスカタログは `.claude-plugin/marketplace.json`。plugin を追加・改名・削除したら、カタログも同じ変更で更新する (`source: "./plugins/<name>"`)
+- plugin を改名・削除したら、カタログ top-level の `renames` に旧名 → 新名 (削除なら `null`) を追記する。append-only で消さない。書かないとインストール済みの環境で plugin が見つからなくなる
 - 配布物は `plugins/<name>/` にフラット配置する。マニフェストは `plugins/<name>/.claude-plugin/plugin.json`
-- plugin の中身を変えたら `plugin.json` の `version` を bump する。`version` は cache key で、据え置くと更新が届かない
+- `<name>` は kebab-case とし、`claude-` / `anthropic-` / `cc-plugin-` で始めない。カタログ entry の `name` と `plugin.json` の `name` を一致させる
+- `version` は `plugin.json` に明示し、plugin の中身を変えたら必ず bump する。カタログ entry には `version` を書かない。`version` は cache key で、据え置くと GitHub 経由の購読者に更新が届かない。この規約は `.githooks/check-plugins.sh` が commit 前に検査する (判定範囲は merge-base からのブランチ全体)
 - 機能は skills で構成し、commands は作らない
 - 各 plugin にオリエンテーション skill を 1 つ置く。配置は `skills/<plugin-name>/SKILL.md`
-- 各 plugin は自己完結に保つ。インストール時に cache へコピーされるため、`../` で repo 内の他ファイルを参照できない
-- commit 前に `claude plugin validate .` (カタログ) と `claude plugin validate plugins/<name>` (各 plugin) を通す
+- 各 plugin は自己完結に保つ。GitHub 経由のインストールでは plugin ディレクトリだけが cache へコピーされるため、`../` で repo 内の他ファイルを参照しない。ローカルパス登録 (開発モード) では in-place で読まれて動いてしまうので、手元で動いたことを根拠にしない
+- `claude plugin validate .` (カタログ) と `claude plugin validate plugins/<name>` (各 plugin) は `.githooks/check-plugins.sh` が commit 前に実行する。基準は既定モード (警告は許容、エラーで停止) で、`--strict` は求めない。validate は source の実在を見ないため、カタログと `plugins/` の整合 (source の実在 / name の一致 / 掲載漏れ / entry の `version`) も同じ hook が検査する
 
 ## 設計原則
 

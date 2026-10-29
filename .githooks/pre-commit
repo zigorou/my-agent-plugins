@@ -9,3 +9,5 @@ if ! command -v gitleaks >/dev/null 2>&1; then
 fi
 
 gitleaks protect --staged --redact --verbose
+
+"$(dirname "$0")/check-plugins.sh"
