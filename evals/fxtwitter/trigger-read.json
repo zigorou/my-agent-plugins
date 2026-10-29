@@ -1,0 +1,22 @@
+[
+  {"query": "このポスト、うちのプロダクトの話っぽいんだけど何て言われてる？ https://x.com/levelsio/status/2114797163372847446", "should_trigger": true},
+  {"query": "https://x.com/paulg/status/2114815685960618081 これって YC の新しい方針の話？ 投資家目線でどう読める？", "should_trigger": true},
+  {"query": "上司から「これ読んどいて」って https://twitter.com/naval/status/2100234414739571063 が送られてきた。要するに何？ 明日の1on1で触れたい", "should_trigger": true},
+  {"query": "このツイートで紹介されてるライブラリ、うちの Next.js プロジェクトに入れる価値ある？ https://x.com/buzzdotxyz/status/2115816164945527294", "should_trigger": true},
+  {"query": "https://x.com/jack/status/20 の内容を踏まえて、Twitter 初期の UX について 3 行で書いて", "should_trigger": true},
+  {"query": "この炎上してるポストの論点を整理して、反論されてる点も教えて https://x.com/naval/status/2099476024979317096", "should_trigger": true},
+  {"query": "ブログ記事の参考文献にしたい。https://x.com/paulg/status/2114797163372847446 の主張を一文で要約して引用文っぽくして", "should_trigger": true},
+  {"query": "https://fxtwitter.com/levelsio/status/2114797163372847446 ←これ事実確認したい。書いてある数字って本当？", "should_trigger": true},
+  {"query": "この X の記事を踏まえて、うちのチームのオンボーディング資料に足すべきことある？ https://x.com/naval/status/2100234414739571063", "should_trigger": true},
+  {"query": "友達が https://x.com/buzzdotxyz/status/2115816164945527294 をシェアしてきたけど、これ広告？ それとも何か新しい発表？", "should_trigger": true},
+  {"query": "/fxtwitter:fxtwitter-show https://x.com/jack/status/20", "should_trigger": false},
+  {"query": "https://x.com/paulg/status/2114815685960618081 このスレッド、連投全部読んで要点まとめて", "should_trigger": false},
+  {"query": "このツイートの本文をそのまま全部表示して。画像のURLも https://x.com/buzzdotxyz/status/2115816164945527294", "should_trigger": false},
+  {"query": "markdown ファイル内の x.com/〇〇/status/〇〇 のリンクを全部 fxtwitter.com に置換する sed コマンド書いて", "should_trigger": false},
+  {"query": "README の参考リンクに https://x.com/jack/status/20 を追記しといて。中身は読まなくていい、リンクだけ", "should_trigger": false},
+  {"query": "Discord で x.com のリンクが埋め込み表示されないんだけど、fxtwitter ってどういう仕組みで直してるの？", "should_trigger": false},
+  {"query": "X の API (v2) で自分のツイートを投稿する Python スクリプトを書きたい。認証まわりから教えて", "should_trigger": false},
+  {"query": "この正規表現 ^https://x\\.com/\\w+/status/\\d+$ が mobile.twitter.com の URL にマッチしないのを直して", "should_trigger": false},
+  {"query": "このBlueskyの投稿の中身を教えて https://bsky.app/profile/jay.bsky.team/post/3l6oveex3ii2l", "should_trigger": false},
+  {"query": "新機能リリースの告知ツイートを 140 字以内で 3 案書いて。ハッシュタグは #Claude で", "should_trigger": false}
+]
