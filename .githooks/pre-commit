@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "springhead: gitleaks が未導入のため commit を停止しました (secret スキャンを実行できません)。" >&2
+  echo "  導入: https://github.com/gitleaks/gitleaks#installing  (例: brew install gitleaks)" >&2
+  echo "  意図的に迂回する場合のみ: git commit --no-verify" >&2
+  exit 1
+fi
+
+gitleaks protect --staged --redact --verbose
